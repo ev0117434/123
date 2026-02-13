@@ -13,5 +13,9 @@ memmap2 = "0.9"
 libc = "0.2"
 anyhow = "1.0"
 
+[[bin]]
+name = "test_ws_simple"
+path = "test_ws_simple.rs"
+
 [dev-dependencies]
 # For testing
