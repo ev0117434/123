@@ -192,6 +192,13 @@ impl WsManager {
             .enumerate()
             .map(|(i, conn)| {
                 tokio::spawn(async move {
+                    // Staggered startup: 200ms delay between connections to avoid rate limits
+                    let startup_delay = tokio::time::Duration::from_millis(i as u64 * 200);
+                    if startup_delay.as_millis() > 0 {
+                        eprintln!("[WS-{}] Waiting {:?} before startup (rate limiting)...", i, startup_delay);
+                        tokio::time::sleep(startup_delay).await;
+                    }
+
                     let mut backoff = BackoffCalculator::new();
                     let mut consecutive_errors = 0;
 
@@ -216,8 +223,10 @@ impl WsManager {
                             }
                         }
 
-                        // Reconnect with backoff
-                        let delay = backoff.next_delay();
+                        // Reconnect with backoff + jitter to avoid thundering herd
+                        let base_delay = backoff.next_delay();
+                        let jitter_ms = (i as u64 * 50) % 500; // 0-500ms jitter based on connection id
+                        let delay = base_delay + tokio::time::Duration::from_millis(jitter_ms);
                         eprintln!("[WS-{}] Reconnecting in {:?}...", i, delay);
                         tokio::time::sleep(delay).await;
                     }
