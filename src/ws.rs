@@ -192,8 +192,8 @@ impl WsManager {
             .enumerate()
             .map(|(i, conn)| {
                 tokio::spawn(async move {
-                    // Staggered startup: 200ms delay between connections to avoid rate limits
-                    let startup_delay = tokio::time::Duration::from_millis(i as u64 * 200);
+                    // Staggered startup: 1 second delay between connections to avoid rate limits
+                    let startup_delay = tokio::time::Duration::from_secs(i as u64);
                     if startup_delay.as_millis() > 0 {
                         eprintln!("[WS-{}] Waiting {:?} before startup (rate limiting)...", i, startup_delay);
                         tokio::time::sleep(startup_delay).await;
