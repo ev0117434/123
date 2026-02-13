@@ -31,7 +31,7 @@ pub struct StreamMessage {
 fn create_ws_url(symbols: &[String]) -> String {
     let streams: Vec<String> = symbols
         .iter()
-        .map(|s| format!("{}@bookTicker", s.to_lowercase()))
+        .map(|s| format!("{}@bookticker", s.to_lowercase()))
         .collect();
 
     format!("{}/stream?streams={}", WS_BASE, streams.join("/"))
