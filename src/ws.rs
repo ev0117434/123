@@ -5,7 +5,7 @@ use tokio_tungstenite::{connect_async, tungstenite::Message};
 use std::sync::Arc;
 
 const WS_BASE: &str = "wss://fstream.binance.com";
-const CHUNK_SIZE: usize = 512; // Max streams per connection
+const CHUNK_SIZE: usize = 100; // Max streams per connection
 
 /// Binance Futures bookTicker message
 #[derive(Debug, Deserialize, Serialize)]
@@ -301,10 +301,10 @@ mod tests {
         let symbols: Vec<String> = (0..1000).map(|i| format!("SYM{}", i)).collect();
         let chunks = chunk_symbols(&symbols);
 
-        // 1000 symbols should make 2 chunks (512 + 488)
-        assert_eq!(chunks.len(), 2);
-        assert_eq!(chunks[0].len(), 512);
-        assert_eq!(chunks[1].len(), 488);
+        // 1000 symbols should make 10 chunks (100 * 10)
+        assert_eq!(chunks.len(), 10);
+        assert_eq!(chunks[0].len(), 100);
+        assert_eq!(chunks[9].len(), 100);
     }
 
     #[test]
